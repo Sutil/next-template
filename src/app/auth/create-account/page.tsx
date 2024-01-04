@@ -2,18 +2,32 @@
 import TextInput from "@/components/custom/text-input";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
+import { createAccount } from "@/lib/firebase/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { UseFormReturn, useForm } from "react-hook-form";
 import * as z from "zod";
 
-const formSchema = z.object({
-  username: z.string().email("E-mail inválido"),
-  password: z.string().min(1, "Informe sua senha"),
-  confirmPassword: z.string().min(1, "Confirme sua senha"),
-});
+const formSchema = z
+  .object({
+    username: z.string().email("E-mail inválido"),
+    password: z.string().min(6, "Crie uma senha com pelo menos 6 caracteres."),
+    confirmPassword: z.string(),
+  })
+  .superRefine(({ password, confirmPassword }, ctx) => {
+    console.log("test", password, confirmPassword);
+    if (password !== confirmPassword) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["confirmPassword"],
+        message: "Parece que você digitou uma senha diferente",
+      });
+    }
+  });
 
 export default function CreateAccount() {
+  const router = useRouter();
   const form: UseFormReturn<any> = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -25,9 +39,12 @@ export default function CreateAccount() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+    const { username, password } = values;
+    createAccount(username, password)
+      .then(() => {
+        router.push("/main");
+      })
+      .catch(() => {});
   }
 
   return (
@@ -55,7 +72,11 @@ export default function CreateAccount() {
           name="confirmPassword"
         />
         <div className="w-full">
-          <Button className="w-full" type="submit">
+          <Button
+            className="w-full"
+            type="submit"
+            disabled={!form.formState.isValid}
+          >
             Criar conta
           </Button>
         </div>
