@@ -11,6 +11,7 @@ import * as z from "zod";
 
 const formSchema = z
   .object({
+    name: z.string().min(1, "Informe seu nome"),
     username: z.string().email("E-mail inválido"),
     password: z.string().min(6, "Crie uma senha com pelo menos 6 caracteres."),
     confirmPassword: z.string(),
@@ -31,6 +32,7 @@ export default function CreateAccount() {
   const form: UseFormReturn<any> = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: "",
       username: "",
       password: "",
       confirmPassword: "",
@@ -39,8 +41,8 @@ export default function CreateAccount() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    const { username, password } = values;
-    createAccount(username, password)
+    const { name, username, password } = values;
+    createAccount(name, username, password)
       .then(() => {
         router.push("/main");
       })
@@ -50,6 +52,13 @@ export default function CreateAccount() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-8">
+        <TextInput
+          type="text"
+          form={form}
+          placeholder="Informe seu nome"
+          label="Nome"
+          name="name"
+        />
         <TextInput
           type="text"
           form={form}
