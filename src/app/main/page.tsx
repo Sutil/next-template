@@ -1,3 +1,10 @@
+import Header from "./header";
+
 export default function Main() {
-  return <div>Minha aplicação aparecerá aqui.</div>;
+  return (
+    <main>
+      <Header />
+      <div>test</div>
+    </main>
+  );
 }

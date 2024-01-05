@@ -4,6 +4,7 @@ import {
   UserCredential,
   onAuthStateChanged as _onAuthStateChanged,
   createUserWithEmailAndPassword,
+  updateProfile,
 } from "firebase/auth";
 
 import { auth } from "./firebase";
@@ -12,11 +13,18 @@ export function onAuthStateChanged(cb: NextOrObserver<User>) {
   return _onAuthStateChanged(auth, cb);
 }
 
-export function createAccount(
+export async function createAccount(
+  name: string,
   email: string,
   password: string
 ): Promise<UserCredential> {
-  return createUserWithEmailAndPassword(auth, email, password);
+  const credential = await createUserWithEmailAndPassword(
+    auth,
+    email,
+    password
+  );
+  updateProfile(credential.user, { displayName: name });
+  return credential;
 }
 
 export function signOut() {
