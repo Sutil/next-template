@@ -4,6 +4,8 @@ import {
   UserCredential,
   onAuthStateChanged as _onAuthStateChanged,
   createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
   updateProfile,
 } from "firebase/auth";
 
@@ -25,6 +27,14 @@ export async function createAccount(
   );
   updateProfile(credential.user, { displayName: name });
   return credential;
+}
+
+export function signIn(username: string, password: string) {
+  return signInWithEmailAndPassword(auth, username, password);
+}
+
+export function recoverPassword(email: string) {
+  return sendPasswordResetEmail(auth, email);
 }
 
 export function signOut() {

@@ -1,3 +1,4 @@
+import { useCurrentUser } from "@/lib/firebase/current-user";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

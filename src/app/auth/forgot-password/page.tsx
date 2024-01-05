@@ -2,8 +2,11 @@
 import TextInput from "@/components/custom/text-input";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
+import { useToast } from "@/components/ui/use-toast";
+import { recoverPassword } from "@/lib/firebase/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { UseFormReturn, useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -20,10 +23,19 @@ export default function ForgetPassword() {
     mode: "onTouched",
   });
 
+  const router = useRouter();
+  const { toast } = useToast();
+
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+    const { username } = values;
+    recoverPassword(username).then(() => {
+      toast({
+        title: "Recuperação de senha",
+        description: "Verifique seu e-mail!",
+        variant: "destructive",
+      });
+      router.push("/auth/login");
+    });
   }
 
   return (
@@ -37,7 +49,11 @@ export default function ForgetPassword() {
           name="username"
         />
         <div className="w-full">
-          <Button className="w-full" type="submit">
+          <Button
+            className="w-full"
+            type="submit"
+            disabled={!form.formState.isValid}
+          >
             Recuperar senha
           </Button>
         </div>

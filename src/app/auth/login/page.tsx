@@ -2,10 +2,13 @@
 import TextInput from "@/components/custom/text-input";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
+import { signIn } from "@/lib/firebase/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { UseFormReturn, useForm } from "react-hook-form";
 import * as z from "zod";
+import { useAuthGuard } from "../use-guard";
 
 const formSchema = z.object({
   username: z.string().email("E-mail inválido"),
@@ -13,6 +16,7 @@ const formSchema = z.object({
 });
 
 export default function Login() {
+  useAuthGuard();
   const form: UseFormReturn<any> = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -21,11 +25,13 @@ export default function Login() {
     },
     mode: "onTouched",
   });
+  const router = useRouter();
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+    const { username, password } = values;
+    signIn(username, password).then(() => {
+      router.push("/main");
+    });
   }
 
   return (
@@ -46,7 +52,11 @@ export default function Login() {
           name="password"
         />
         <div className="w-full">
-          <Button className="w-full" type="submit">
+          <Button
+            className="w-full"
+            type="submit"
+            disabled={!form.formState.isValid}
+          >
             Entrar
           </Button>
         </div>
