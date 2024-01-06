@@ -16,7 +16,6 @@ const formSchema = z.object({
 });
 
 export default function Login() {
-  useAuthGuard();
   const form: UseFormReturn<any> = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
