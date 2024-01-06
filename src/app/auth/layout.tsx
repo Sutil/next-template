@@ -1,5 +1,6 @@
 import { useCurrentUser } from "@/lib/firebase/current-user";
 import type { Metadata } from "next";
+import { AuthGuard } from "./auth-guard";
 
 export const metadata: Metadata = {
   title: "Autenticação",
@@ -12,6 +13,7 @@ export default function AuthLayout({
 }) {
   return (
     <div className="w-full h-full flex flex-col items-center p-10">
+      <AuthGuard />
       <header>
         <div className="w-32 h-32 bg-primary"></div>
       </header>

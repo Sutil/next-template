@@ -2,13 +2,12 @@
 import TextInput from "@/components/custom/text-input";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
+import { useToast } from "@/components/ui/use-toast";
 import { signIn } from "@/lib/firebase/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { UseFormReturn, useForm } from "react-hook-form";
 import * as z from "zod";
-import { useAuthGuard } from "../use-guard";
 
 const formSchema = z.object({
   username: z.string().email("E-mail inválido"),
@@ -24,12 +23,18 @@ export default function Login() {
     },
     mode: "onTouched",
   });
-  const router = useRouter();
+
+  const { toast } = useToast();
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     const { username, password } = values;
-    signIn(username, password).then(() => {
-      router.push("/main");
+    signIn(username, password).catch(() => {
+      toast({
+        title: "Falha ao fazer login",
+        description:
+          "Verifique se seu usuário e senha estão corretos ou clique em 'Esqueci a senha'",
+        variant: "destructive",
+      });
     });
   }
 

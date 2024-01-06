@@ -1,14 +1,16 @@
+"use client";
 import { useCurrentUser } from "@/lib/firebase/current-user";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 import { useEffect } from "react";
 
-export function useAuthGuard() {
+export function AuthGuard() {
   const user = useCurrentUser();
-  const router = useRouter();
 
   useEffect(() => {
     if (user && user !== "loading") {
-      router.push("/main");
+      redirect("/main");
     }
-  }, [user, router]);
+  }, [user]);
+
+  return null;
 }
